@@ -34,7 +34,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BK_URL}/api/auth/register`,
+        formData
+      );
       const token = res.data.token;
       localStorage.setItem("token", token);
       setUser({ ...res.data.user, token });

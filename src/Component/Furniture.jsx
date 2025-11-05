@@ -1,82 +1,94 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-const Furniture = () => {
-  const [shoes, setShoes] = useState([]);
 
+const Furniture = () => {
+  const [furniture, setFurniture] = useState([]);
   const cartId = localStorage.getItem("cartId");
+
   useEffect(() => {
-    const fetchShoes = async () => {
+    const fetchFurniture = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/products/category/furniture"
+          `${import.meta.env.VITE_BK_URL}/api/products/category/furniture`
         );
-        setShoes(res.data);
+        setFurniture(res.data);
       } catch (err) {
-        toast.error("Ops something went wrong");
+        toast.error("Oops! Something went wrong");
       }
     };
 
-    fetchShoes();
+    fetchFurniture();
   }, []);
-  console.log(shoes);
+
   return (
-    <div className="min-h-screen bg-blue-50 text-gray-800 p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {shoes.map((product) => (
-          <div
-            key={product._id}
-            className="bg-white rounded-xl shadow-[0px_6px_19px_6px_#dbeafe] p-4 hover:shadow-lg transition flex flex-col"
-            style={{ height: "420px", width: "300px" }}
-          >
-            <img
-              src={
-                product?.imgUrl?.startsWith("data:image")
-                  ? product.imgUrl
-                  : product?.imgUrl ||
-                    product?.imgurl ||
-                    "https://via.placeholder.com/150"
-              }
-              alt={product?.name || "Product"}
-              className="w-full h-40 object-contain rounded-md mb-4 bg-white"
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/150";
-              }}
-            />
+    <div className="min-h-screen bg-blue-50 text-gray-800 px-4 sm:px-6 md:px-8 py-8">
+      {/* Header */}
+      <h1 className="text-3xl font-bold text-blue-800 mb-8 text-center">
+        Furniture Collection
+      </h1>
 
-            <h2 className="text-xl font-semibold text-blue-800 mb-1 line-clamp-1">
-              {product.name}
-            </h2>
-
-            <p
-              className="text-sm text-gray-600 mb-2 line-clamp-2 overflow-hidden text-ellipsis"
-              style={{ maxHeight: "3.2em" }}
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
+        {furniture.length === 0 ? (
+          <p className="text-center text-gray-600 col-span-full">
+            No furniture items found.
+          </p>
+        ) : (
+          furniture.map((product) => (
+            <div
+              key={product._id}
+              className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 p-5 flex flex-col items-start w-[90%] sm:w-[85%] md:w-[250px] lg:w-[260px] xl:w-[280px]"
             >
-              {product.description}
-            </p>
+              {/* Product Image */}
+              <div className="w-full h-48 flex justify-center items-center bg-white rounded-lg mb-4 overflow-hidden">
+                <img
+                  src={
+                    product?.imgUrl?.startsWith("data:image")
+                      ? product.imgUrl
+                      : product?.imgUrl ||
+                        product?.imgurl ||
+                        "https://via.placeholder.com/150"
+                  }
+                  alt={product?.name || "Product"}
+                  className="max-h-44 object-contain"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/150";
+                  }}
+                />
+              </div>
 
-            <div className="text-sm text-gray-700 mb-4">
-              <p>
-                <span className="font-medium">Price:</span> ₹{product.price}
-              </p>
-              <p>
-                <span className="font-medium">In Stock:</span>{" "}
-                {product.quantity}
-              </p>
-            </div>
+              {/* Product Details */}
+              <h2 className="text-lg font-semibold text-blue-800 mb-1 line-clamp-1">
+                {product.name}
+              </h2>
 
-            {/* 🔗 View Details */}
-            <div className="mt-auto">
-              <Link to={`/product/${product._id}/${cartId}`}>
-                <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition text-sm w-full">
-                  View Details
-                </button>
-              </Link>
+              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                {product.description}
+              </p>
+
+              <div className="text-sm text-gray-700 mb-4 w-full">
+                <p>
+                  <span className="font-medium">Price:</span> ₹{product.price}
+                </p>
+                <p>
+                  <span className="font-medium">In Stock:</span>{" "}
+                  {product.quantity}
+                </p>
+              </div>
+
+              {/* View Details Button */}
+              <div className="mt-auto w-full">
+                <Link to={`/product/${product._id}/${cartId}`}>
+                  <button className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition text-sm w-full">
+                    View Details
+                  </button>
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

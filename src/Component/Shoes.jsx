@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect , useState } from 'react';
 import{Link} from "react-router-dom";
 import axios from 'axios';
+import toast from 'react-hot-toast';
 const Shoes = () => {
   
   const [shoes , setShoes] = useState([])
@@ -10,10 +11,12 @@ const Shoes = () => {
   useEffect(() => {
   const fetchShoes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products/category/shoes");
+      const res = await axios.get(
+        `${import.meta.env.VITE_BK_URL}/api/products/category/shoes`
+      );
       setShoes(res.data); // assuming useState([]) declared as shoes
     } catch (err) {
-      console.error("Failed to fetch shoes", err);
+      toast.error("Failed to fetch shoes");
     }
   };
 

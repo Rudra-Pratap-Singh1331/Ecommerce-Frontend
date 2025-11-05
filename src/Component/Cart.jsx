@@ -5,7 +5,7 @@ import { AuthContext } from "../Context/AuthContext";
 import { toast } from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io(import.meta.env.VITE_BK_URL);
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -40,19 +40,21 @@ const Cart = () => {
     localStorage.removeItem("cartUserId");
     socket.emit("join-collaboration", id);
     navigate(`/cart/${id}`);
-    toast.success("Joined Collaborative cart")
+    toast.success("Joined Collaborative cart");
   };
 
   const handleDisconnectCart = () => {
     socket.emit("leave-collaboration", collaboratingCartId);
-    const newId = `cart_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const newId = `cart_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 6)}`;
     localStorage.setItem("cartId", newId);
     localStorage.setItem("cartUserId", user._id);
     setIsCollaborating(false);
     setCollaboratingCartId("");
     setInputCartId("");
     navigate(`/cart/${newId}`);
-    toast.success("Disconnected")
+    toast.success("Disconnected");
   };
 
   useEffect(() => {
@@ -68,7 +70,9 @@ const Cart = () => {
 
     if (!isSameUser && !urlCartId) {
       toast.error("Invalid cart session. Reloading.");
-      const newId = `cart_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const newId = `cart_${Date.now()}_${Math.random()
+        .toString(36)
+        .slice(2, 6)}`;
       localStorage.setItem("cartId", newId);
       localStorage.setItem("cartUserId", user._id);
       navigate(`/cart/${newId}`);
@@ -77,11 +81,13 @@ const Cart = () => {
 
     const fetchCart = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/cart/get/${actualCartId}`);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BK_URL}/api/cart/get/${actualCartId}`
+        );
         setCartItems(res.data.products || []);
         cartRef.current = res.data.products || [];
       } catch (err) {
-        console.error("Error loading cart:", err);
+   
         toast.error("Cart not found or failed to load");
         if (err.response?.status === 401) {
           logout();
@@ -92,13 +98,16 @@ const Cart = () => {
 
     const fetchLoyalty = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/profile", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_BK_URL}/api/auth/profile`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
 
         setLoyaltyPoints(res.data.loyaltyPoints || 0);
       } catch (err) {
-        console.error("Failed to fetch loyalty points:", err);
+          toast.error("Failed to fetch loyalty points");
       }
     };
 
@@ -108,7 +117,8 @@ const Cart = () => {
     socket.emit("join-cart", actualCartId);
     socket.on("receive-cart", (updatedCart) => {
       const newItems = updatedCart.products || [];
-      const hasChanged = JSON.stringify(cartRef.current) !== JSON.stringify(newItems);
+      const hasChanged =
+        JSON.stringify(cartRef.current) !== JSON.stringify(newItems);
       if (hasChanged) {
         cartRef.current = newItems;
         setCartItems(newItems);
@@ -118,18 +128,27 @@ const Cart = () => {
     return () => {
       socket.off("receive-cart");
     };
-  }, [actualCartId, user?._id, user?.token, navigate, logout, isSameUser, urlCartId, cartUserId]);
+  }, [
+    actualCartId,
+    user?._id,
+    user?.token,
+    navigate,
+    logout,
+    isSameUser,
+    urlCartId,
+    cartUserId,
+  ]);
 
   const updateQuantity = async (id, type) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/cart/update", {
+      const res = await axios.post(`${import.meta.env.VITE_BK_URL}/api/cart/update`, {
         cartId: actualCartId,
         productId: id,
         action: type === "increase" ? "add" : "remove",
       });
 
       const updatedItems = res.data.products || [];
-      const nonZeroItems = updatedItems.filter(item => item.quantity > 0);
+      const nonZeroItems = updatedItems.filter((item) => item.quantity > 0);
       setCartItems(nonZeroItems);
       cartRef.current = nonZeroItems;
 
@@ -139,13 +158,12 @@ const Cart = () => {
       });
 
       if (nonZeroItems.length === 0) {
-        await axios.delete("http://localhost:5000/api/cart/clear", {
+        await axios.delete(`${import.meta.env.VITE_BK_URL}/api/cart/clear`, {
           data: { cartId: actualCartId },
         });
         toast.success("All items removed. Cart is now empty.");
       }
     } catch (err) {
-      console.error("Quantity update error:", err.response?.data || err.message);
       toast.error("Failed to update quantity");
     }
   };
@@ -157,21 +175,25 @@ const Cart = () => {
         return;
       }
 
-      await axios.post("http://localhost:5000/api/sales/add", {
+      await axios.post(`${import.meta.env.VITE_BK_URL}/api/sales/add`, {
         userId: user._id,
-        products: cartItems.map(item => ({
+        products: cartItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
         })),
       });
 
-      await axios.put("http://localhost:5000/api/users/update-loyalty", {
-        newPoints: 0,
-      }, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
+      await axios.put(
+        `${import.meta.env.VITE_BK_URL}/api/users/update-loyalty`,
+        {
+          newPoints: 0,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
 
-      await axios.delete("http://localhost:5000/api/cart/clear", {
+      await axios.delete(`${import.meta.env.VITE_BK_URL}/api/cart/clear`, {
         data: { cartId: actualCartId },
       });
 
@@ -186,12 +208,15 @@ const Cart = () => {
         updatedCart: { products: [] },
       });
     } catch (err) {
-      console.error("Buy error:", err.response?.data || err.message);
+
       toast.error("Failed to complete purchase");
     }
   };
 
-  const productTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const productTotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   const discountAmount = productTotal * discount;
   const grandTotal = productTotal - discountAmount + deliveryFee;
   const loyaltyWorth = useLoyalty ? loyaltyPoints : 0;
@@ -234,20 +259,25 @@ const Cart = () => {
       ) : (
         <>
           <div className="space-y-4">
-            {cartItems.map(item => (
-              <div key={String(item.productId)} className="flex items-center justify-between border p-4 rounded-md shadow-md">
+            {cartItems.map((item) => (
+              <div
+                key={String(item.productId)}
+                className="flex items-center justify-between border p-4 rounded-md shadow-md"
+              >
                 <div className="flex items-center gap-4">
                   <img
                     src={
                       item?.imgUrl?.startsWith("data:image")
                         ? item.imgUrl
-                        : item?.imgUrl || "https://dummyimage.com/150x150/cccccc/000000&text=No+Image"
+                        : item?.imgUrl ||
+                          "https://dummyimage.com/150x150/cccccc/000000&text=No+Image"
                     }
                     alt={item?.name || "Product"}
                     className="w-32 h-32 object-contain rounded-md bg-white"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = "https://dummyimage.com/150x150/cccccc/000000&text=No+Image";
+                      e.target.src =
+                        "https://dummyimage.com/150x150/cccccc/000000&text=No+Image";
                     }}
                   />
                   <div>
@@ -260,12 +290,16 @@ const Cart = () => {
                   <button
                     onClick={() => updateQuantity(item.productId, "decrease")}
                     className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                  >-</button>
+                  >
+                    -
+                  </button>
                   <span className="px-3">{item.quantity}</span>
                   <button
                     onClick={() => updateQuantity(item.productId, "increase")}
                     className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                  >+</button>
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             ))}
@@ -276,7 +310,9 @@ const Cart = () => {
             <p>Discount (10%): -₹{discountAmount.toFixed(2)}</p>
             <p>Delivery Fee: ₹{deliveryFee.toFixed(2)}</p>
             <hr />
-            <p className="text-xl font-bold">Final Amount: ₹{finalAmount.toFixed(2)}</p>
+            <p className="text-xl font-bold">
+              Final Amount: ₹{finalAmount.toFixed(2)}
+            </p>
             <button
               onClick={handleBuy}
               className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"

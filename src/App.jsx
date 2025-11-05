@@ -7,7 +7,7 @@ import Furniture from "./Component/Furniture";
 import Mobile from "./Component/Mobile";
 import Laptop from "./Component/Laptop";
 import Search from "./Component/Search";
-import Login from "./Component/Login";         
+import Login from "./Component/Login";
 import Register from "./Component/Register";
 import Grocery from "./Component/Grocery";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -17,36 +17,34 @@ import "./index.css";
 
 function App() {
   const router = createBrowserRouter([
- 
-     {
-    path: "/",
-    element: <Navigate to="/login" />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/",
-    element: <AppLayout />,
-    children: [
-      { path: "/home", element: <AllProducts /> },
-      { path: "/cart/:cartId", element: <Cart /> },
-      { path: "/product/:id/:cartId", element: <ProductDetail /> },
-      { path: "/shoes", element: <Shoes /> },
-      { path: "/furniture", element: <Furniture /> },
-      { path: "/mobile", element: <Mobile /> },
-      { path: "/laptop", element: <Laptop /> },
-      { path: "/grocery" , element: <Grocery/>},
-      { path: "/search", element: <Search /> },
-
-    ],
-  },
-])
+    {
+      path: "/",
+      element: <Navigate to="/login" />,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "/",
+      element: <AppLayout />,
+      children: [
+        { path: "/home", element: <AllProducts /> },
+        { path: "/cart/:cartId", element: <Cart /> },
+        { path: "/product/:id/:cartId", element: <ProductDetail /> },
+        { path: "/shoes", element: <Shoes /> },
+        { path: "/furniture", element: <Furniture /> },
+        { path: "/mobile", element: <Mobile /> },
+        { path: "/laptop", element: <Laptop /> },
+        { path: "/grocery", element: <Grocery /> },
+        { path: "/search", element: <Search /> },
+      ],
+    },
+  ]);
 
   return (
     <>
