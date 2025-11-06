@@ -53,12 +53,14 @@ const Register = () => {
       <Toaster />
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-yellow-400">
         <h2 className="text-3xl font-bold text-blue-800 text-center mb-6">
-          Walmart Customer Register
+          MerchantMate Register
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -71,7 +73,9 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -84,7 +88,9 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"

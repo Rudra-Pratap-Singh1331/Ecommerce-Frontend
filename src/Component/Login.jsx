@@ -32,7 +32,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-yellow-400">
         <h2 className="text-3xl font-bold text-blue-800 text-center mb-6">
-          Walmart Customer Login
+          MerchantMate Login
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
